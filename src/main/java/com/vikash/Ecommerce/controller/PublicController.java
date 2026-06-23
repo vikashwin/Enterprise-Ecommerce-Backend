@@ -3,9 +3,6 @@ package com.vikash.Ecommerce.controller;
 import com.vikash.Ecommerce.entity.User;
 import com.vikash.Ecommerce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,7 +13,7 @@ public class PublicController {
     private UserService userService;
 
 
-    @GetMapping
+    @GetMapping("/test")
     public String test(){
         return "Test is Working";
     }
