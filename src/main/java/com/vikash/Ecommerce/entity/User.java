@@ -2,9 +2,7 @@ package com.vikash.Ecommerce.entity;
 
 import com.vikash.Ecommerce.entity.type.UserGender;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +12,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -46,14 +46,15 @@ public class User {
             name = "user_name",
             nullable = false
     )
-    @NotNull
+    @NotBlank(message = "Name is required")
     private String name;
 
     @Column(
             name = "user_password",
             nullable = false
     )
-    @NotNull
+    @NotBlank // they also reject "  " not only null
+    @Size(min = 8, max = 100)
     private String password;
 
     @Column(
@@ -61,16 +62,20 @@ public class User {
             nullable = false,
             unique = true
     )
-    @Email
+    @Email(message = "Please enter a valid email")
+    @NotBlank
     private String email;
 
     @Column(
             name = "user_number",
-            nullable = false,
-            unique = true,
-            length = 10
+            nullable = false, // means null not store
+            unique = true
     )
-    @Pattern(regexp = "^[0-9]{10}$")
+    @NotBlank
+    @Pattern(
+            regexp = "^[0-9]{10}$",
+            message = "Phone number must contain exactly 10 digits"
+    )
     private String phoneNumber;
 
     @Column(name = "date_of_birth", nullable = false)
@@ -84,8 +89,8 @@ public class User {
 
     //@OneToMany relationship always exit in inverse side
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL , orphanRemoval = true)
-    @NotNull
-    private List<Address> addresses;
+    @Builder.Default
+    private List<Address> addresses = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -93,13 +98,16 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    @Builder.Default // Help to deal with nullPointerException when work with empty set
+    private Set<Role> roles = new HashSet<>(); // this created a default empty set
 
     @OneToMany(mappedBy="user", cascade = CascadeType.PERSIST)
-    private List<Order> orders;
+    @Builder.Default
+    private List<Order> orders = new ArrayList<>();
 
     @OneToMany(mappedBy="user" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
-    private List<Review> reviews;
+    @Builder.Default
+    private List<Review> reviews = new ArrayList<>();
 
     @UpdateTimestamp
     @Column(name = "updated_at")

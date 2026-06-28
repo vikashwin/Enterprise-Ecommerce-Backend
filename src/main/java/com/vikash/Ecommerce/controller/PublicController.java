@@ -2,6 +2,7 @@ package com.vikash.Ecommerce.controller;
 
 import com.vikash.Ecommerce.entity.User;
 import com.vikash.Ecommerce.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class PublicController {
     }
 
     @PostMapping
-    public User saveUser(@RequestBody  User user){
+    public User saveUser(@Valid @RequestBody  User user){
         return userService.saveUser(user);
     }
 }

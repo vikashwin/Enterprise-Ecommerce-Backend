@@ -1,6 +1,7 @@
 package com.vikash.Ecommerce.service;
 
 import com.vikash.Ecommerce.entity.User;
+import com.vikash.Ecommerce.exception.ResourceNotFoundException;
 import com.vikash.Ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,22 +23,21 @@ public class UserService {
 
     //Use as update user as id
     public User updateUserById(User user , Long id){
-        User existingUser = userRepository.findById(id).orElse(null);
-        if(existingUser != null){
-            existingUser.setName(user.getName());
-            existingUser.setEmail(user.getEmail());
-            userRepository.save(existingUser);
-            return existingUser;
-        }
-        return null;
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id : " + id));
+        existingUser.setName(user.getName());
+        existingUser.setEmail(user.getEmail());
+
+        return userRepository.save(existingUser); // whenever save then they return updated existingUser
     }
 
     public User getUserById(Long id){
-        User existingUser = userRepository.findById(id).orElse(null);
-        if(existingUser != null){
-            return existingUser;
-        }
-        return null;
+        return userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with id : " + id
+                        ));
     }
 
     public List<User> getAllUser(){
@@ -45,12 +45,11 @@ public class UserService {
     }
 
     public User deleteUserById(Long id){
-        User existingUser = userRepository.findById(id).orElse(null);
-        if(existingUser != null){
-            userRepository.deleteById(id);
-            return existingUser;
-        }
-        return null;
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id : " + id));
+        userRepository.deleteById(id);
+        return existingUser;
     }
 
     public String deleteAll(){

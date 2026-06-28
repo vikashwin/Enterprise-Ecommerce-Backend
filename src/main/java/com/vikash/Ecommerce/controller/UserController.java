@@ -3,6 +3,7 @@ package com.vikash.Ecommerce.controller;
 
 import com.vikash.Ecommerce.entity.User;
 import com.vikash.Ecommerce.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,32 +18,22 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id){
-        User requestedUser = userService.getUserById(id);
-        if(requestedUser != null){
-            return new ResponseEntity<>(requestedUser , HttpStatus.OK);
-        }
-        return new ResponseEntity<>("User Not Fond" , HttpStatus.NOT_FOUND);
+    public ResponseEntity<User> getUserById(@PathVariable Long id){
+        User existingUser = userService.getUserById(id);
+        return new ResponseEntity<>(existingUser , HttpStatus.OK);
+//        return ResponseEntity.ok(userService.getUserById(id));  This is one liner code
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUserById(@RequestBody User user , @PathVariable Long id){
-        User requestedUser = userService.updateUserById(user, id);
-        if(requestedUser != null){
-            return new ResponseEntity<>(requestedUser , HttpStatus.OK);
-        }
-        return new ResponseEntity<>("User Not Found" , HttpStatus.NOT_FOUND);
-
+    public ResponseEntity<User> updateUserById(@Valid @RequestBody User user , @PathVariable Long id){
+        return ResponseEntity.ok(userService.updateUserById(user , id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable Long id){
-        User requestedUser = userService.deleteUserById(id);
-        if(requestedUser != null){
-            return new ResponseEntity<>("User Deleted Successfully", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("User Not Found" , HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id){
+        userService.deleteUserById(id);
 
-
+        return ResponseEntity.ok("User Deleted Successfully");
     }
 }
