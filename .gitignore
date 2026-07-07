@@ -34,3 +34,6 @@ build/
 
 ### Images ###
 /images/
+
+# Ignore YAML files
+*.yml
