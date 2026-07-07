@@ -2,7 +2,9 @@ package com.vikash.Ecommerce.controller;
 
 import com.vikash.Ecommerce.entity.User;
 import com.vikash.Ecommerce.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,19 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
 
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
 
     @GetMapping
-    public List<User> getAllUser(){
-        return userService.getAllUser();
+    public ResponseEntity< List<User> >getAllUser(){
+        return ResponseEntity.ok(userService.getAllUser());
     }
 
     @DeleteMapping
-    public String deleteAll(){
-        return userService.deleteAll();
+    public ResponseEntity<String> deleteAll(){
+        userService.deleteAll();
+        return ResponseEntity.ok("All Users Deleted");
     }
 }

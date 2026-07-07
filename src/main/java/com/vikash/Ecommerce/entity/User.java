@@ -35,39 +35,25 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Generate  sequence unique id
-    @Column(
-            name = "user_id",
-            updatable = false
-    )
+    @Column(name = "user_id", updatable = false)
     private Long id;
 
 
-    @Column(
-            name = "user_name",
-            nullable = false
-    )
+    @Column(name = "user_name", nullable = false)
     @NotBlank(message = "Name is required")
     private String name;
 
-    @Column(
-            name = "user_password",
-            nullable = false
-    )
+    @Column(name = "user_password", nullable = false)
     @NotBlank // they also reject "  " not only null
     @Size(min = 8, max = 100)
     private String password;
 
-    @Column(
-            name = "user_email",
-            nullable = false,
-            unique = true
-    )
+    @Column(name = "user_email", nullable = false, unique = true)
     @Email(message = "Please enter a valid email")
     @NotBlank
     private String email;
 
-    @Column(
-            name = "user_number",
+    @Column(name = "user_number",
             nullable = false, // means null not store
             unique = true
     )
@@ -114,11 +100,7 @@ public class User {
     private LocalDateTime updatedAt;
 
     @CreationTimestamp //Create data and time automatically
-    @Column(
-            name = "created_at",
-            updatable = false,
-            nullable = false
-    )
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
 

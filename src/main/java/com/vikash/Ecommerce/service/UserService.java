@@ -1,43 +1,56 @@
 package com.vikash.Ecommerce.service;
 
+import com.vikash.Ecommerce.dto.UserRequestDTO;
+import com.vikash.Ecommerce.dto.UserResponseDTO;
 import com.vikash.Ecommerce.entity.User;
 import com.vikash.Ecommerce.exception.ResourceNotFoundException;
+import com.vikash.Ecommerce.exception.UserAlreadyExistsException;
+import com.vikash.Ecommerce.mapper.UserMapper;
 import com.vikash.Ecommerce.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
 
-    @Autowired
-    private UserRepository userRepository;
 
-    public User saveUser(User user){
-         userRepository.save(user);
-         return user;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
+    public UserResponseDTO saveUser(UserRequestDTO userRequestDTO){
+        User user = userMapper.toEntity(userRequestDTO); //Map userRequestDTO to UserEntity
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException(
+                    "User with email " + user.getEmail() + " already exists");
+        }
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponse(savedUser); //Map userEntity to userResponseDTO and return userResponseDTO
     }
 
-    //Use as update user as id
-    public User updateUserById(User user , Long id){
+    @Transactional
+    public UserResponseDTO updateUserById(UserRequestDTO userRequestDTO , Long id){
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found with id : " + id));
-        existingUser.setName(user.getName());
-        existingUser.setEmail(user.getEmail());
-
-        return userRepository.save(existingUser); // whenever save then they return updated existingUser
+        userMapper.updateEntity(userRequestDTO , existingUser);
+//        User updatedUser =  userRepository.save(existingUser);  // By using Transaction the line was not necessary
+        return userMapper.toResponse(existingUser);
     }
 
-    public User getUserById(Long id){
-        return userRepository.findById(id)
+    public UserResponseDTO getUserById(Long id){
+        User user =  userRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "User not found with id : " + id
                         ));
+        return userMapper.toResponse(user);
     }
 
     public List<User> getAllUser(){
