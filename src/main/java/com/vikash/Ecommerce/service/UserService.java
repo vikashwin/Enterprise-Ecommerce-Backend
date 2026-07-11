@@ -9,8 +9,6 @@ import com.vikash.Ecommerce.mapper.UserMapper;
 import com.vikash.Ecommerce.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,7 +36,7 @@ public class UserService {
     public UserResponseDTO updateUserById(UserRequestDTO userRequestDTO , Long id){
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id : " + id));
+                        new ResourceNotFoundException("User not found with Id : " + id));
         userMapper.updateEntity(userRequestDTO , existingUser);
 //        User updatedUser =  userRepository.save(existingUser);  // By using Transaction the line was not necessary
         return userMapper.toResponse(existingUser);
