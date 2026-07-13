@@ -1,6 +1,9 @@
 package com.vikash.Ecommerce.config;
 
+import com.vikash.Ecommerce.security.CustomAccessDeniedHandler;
+import com.vikash.Ecommerce.security.JwtAuthenticationEntryPoint;
 import com.vikash.Ecommerce.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +31,8 @@ public class SecurityConfig {
     //We use UserName as Email id
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean // Use for create bean of any method
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -36,13 +41,17 @@ public class SecurityConfig {
                 .sessionManagement(sessionConfig ->
                         sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //Tells don't create or use JSESSIONID
                 .userDetailsService(userDetailsService)
-                .httpBasic(Customizer.withDefaults()) //Allow user to send request with postman by username and password
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**","/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
+
                 .addFilterBefore(jwtAuthenticationFilter , UsernamePasswordAuthenticationFilter.class )
                 .build();
 

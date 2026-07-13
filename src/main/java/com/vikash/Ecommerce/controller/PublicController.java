@@ -25,12 +25,5 @@ public class PublicController {
         return "Test is Working";
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> saveUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
-        return new ResponseEntity<>(
-                userService.saveUser(userRequestDTO),
-                HttpStatus.CREATED
-        );
-    }
 }
 

@@ -5,8 +5,10 @@ import com.vikash.Ecommerce.entity.RefreshToken;
 import com.vikash.Ecommerce.entity.Role;
 import com.vikash.Ecommerce.entity.User;
 import com.vikash.Ecommerce.entity.type.UserRole;
+import com.vikash.Ecommerce.exception.RoleNotFoundException;
 import com.vikash.Ecommerce.exception.UserAlreadyExistsException;
 import com.vikash.Ecommerce.mapper.UserMapper;
+import com.vikash.Ecommerce.repository.RefreshTokenRepository;
 import com.vikash.Ecommerce.repository.RoleRepository;
 import com.vikash.Ecommerce.repository.UserRepository;
 import com.vikash.Ecommerce.security.CustomUserDetails;
@@ -15,6 +17,7 @@ import com.vikash.Ecommerce.security.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,6 +30,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RoleRepository roleRepository;
     private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository repository;
 
     public UserResponseDTO register(UserRequestDTO userRequestDTO){
 
@@ -38,7 +42,7 @@ public class AuthService {
         User user = userMapper.toEntity(userRequestDTO);
 
         Role customerRole = roleRepository.findByName(UserRole.CUSTOMER)
-                .orElseThrow(() -> new RuntimeException("Customer role not found"));
+                .orElseThrow(() -> new RoleNotFoundException("Customer role not found"));
         user.getRoles().add(customerRole);
 
         User savedUser = userRepository.save(user);
@@ -50,7 +54,8 @@ public class AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail(), userLoginDTO.getPassword())
         );
-        User user = userRepository.findUserByEmail(userLoginDTO.getEmail()).orElseThrow();
+        User user = userRepository.findUserByEmail(userLoginDTO.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         RefreshToken refreshToken = refreshTokenService.create(user);
         String accessToken = jwtService.generateToken(new CustomUserDetails(user));
@@ -64,12 +69,14 @@ public class AuthService {
     }
 
     public AuthResponseDTO refresh(RefreshTokenRequestDTO request){
-        RefreshToken refreshToken = refreshTokenService.verify( request.getRefreshToken());
-        User user = refreshToken.getUser();
+        RefreshToken oldToken = refreshTokenService.verify( request.getRefreshToken() );
+        User user = oldToken.getUser();
+        repository.delete(oldToken);
+        RefreshToken newToken = refreshTokenService.create(user);
         String accessToken = jwtService.generateToken(new CustomUserDetails(user));
         return AuthResponseDTO.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
+                .refreshToken(newToken.getToken())
                 .tokenType("Bearer")
                 .expiresIn(jwtService.getExpiration())
                 .build();

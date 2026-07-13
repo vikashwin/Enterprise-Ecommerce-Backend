@@ -38,7 +38,15 @@ public class JwtService {
 
 //    This method is called after successful login.
     public String generateToken(UserDetails userDetails){
-        return generateToken(new HashMap<>() , userDetails);
+        Map<String,Object> claims = new HashMap<>();
+        claims.put(
+                "roles",
+                userDetails.getAuthorities()
+                        .stream()
+                        .map(authority -> authority.getAuthority())
+                        .toList()
+        );
+        return generateToken(claims, userDetails);
     }
 
 //    Generate JWT with additional claims.

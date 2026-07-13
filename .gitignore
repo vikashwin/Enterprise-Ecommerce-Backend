@@ -37,3 +37,6 @@ build/
 
 # Ignore YAML files
 *.yml
+
+# Ignore only local configuration
+src/main/resources/application-local.yml

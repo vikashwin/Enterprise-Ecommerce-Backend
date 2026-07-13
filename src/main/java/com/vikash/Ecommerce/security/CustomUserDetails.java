@@ -1,6 +1,7 @@
 package com.vikash.Ecommerce.security;
 
 import com.vikash.Ecommerce.entity.User;
+import com.vikash.Ecommerce.entity.type.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -57,4 +58,20 @@ public class CustomUserDetails implements UserDetails {
     public User getUser(){
         return user;
     }
+
+    public String getEmail() {
+        return  user.getEmail();
+    }
+
+    public Long getId() {
+        return user.getId();
+    }
+
+    public UserRole getRole(){
+        return user.getRoles()
+                .iterator()
+                .next()
+                .getName();
+    }
+
 }

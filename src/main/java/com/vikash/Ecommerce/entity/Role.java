@@ -2,17 +2,15 @@ package com.vikash.Ecommerce.entity;
 
 import com.vikash.Ecommerce.entity.type.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
 @Table(name = "roles")
 public class Role {

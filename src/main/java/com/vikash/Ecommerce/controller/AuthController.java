@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private RefreshTokenService refreshTokenService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
     public UserResponseDTO register(@RequestBody UserRequestDTO userRequestDTO){
@@ -38,12 +38,8 @@ public class AuthController {
 
 
     @PostMapping("/refresh")
-    public AuthResponseDTO refresh(
-            @RequestBody RefreshTokenRequestDTO request
-    ){
-
+    public AuthResponseDTO refresh(@RequestBody RefreshTokenRequestDTO request){
         return authService.refresh(request);
-
     }
 
 

@@ -2,6 +2,8 @@ package com.vikash.Ecommerce.security;
 
 import com.vikash.Ecommerce.entity.RefreshToken;
 import com.vikash.Ecommerce.entity.User;
+import com.vikash.Ecommerce.exception.InvalidRefreshTokenException;
+import com.vikash.Ecommerce.exception.RefreshTokenExpiredException;
 import com.vikash.Ecommerce.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,18 +51,26 @@ public class RefreshTokenService {
      * Returns the token if it is valid.
      */
     public RefreshToken verify(String token) {
-        RefreshToken refreshToken = repository.findByToken(token).orElseThrow(() ->
-                                new RuntimeException("Refresh token not found"));
+
+        System.out.println("Request token: " + token);
+
+        RefreshToken refreshToken = repository.findByToken(token)
+                .orElseThrow(() -> new InvalidRefreshTokenException("Refresh token not found"));
+
+        System.out.println("DB token: " + refreshToken.getToken());
+        System.out.println("Revoked: " + refreshToken.isRevoked());
+        System.out.println("Expiry: " + refreshToken.getExpiryDate());
+        System.out.println("Now: " + LocalDateTime.now());
 
         if (refreshToken.isRevoked()) {
-            throw new RuntimeException("Refresh token revoked");
+            throw new InvalidRefreshTokenException("Refresh token revoked");
         }
 
-        // Delete expired tokens and reject the request
         if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             repository.delete(refreshToken);
-            throw new RuntimeException("Refresh token expired");
+            throw new RefreshTokenExpiredException("Refresh token expired");
         }
+
         return refreshToken;
     }
 

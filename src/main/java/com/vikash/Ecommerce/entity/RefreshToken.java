@@ -2,7 +2,7 @@ package com.vikash.Ecommerce.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
+
 
 import java.time.LocalDateTime;
 
@@ -21,7 +21,7 @@ public class RefreshToken {
     @Column(nullable = false, unique = true)
     private String token;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //user login with multiple device
     @JoinColumn(name = "user_id")
     private User user;
 
