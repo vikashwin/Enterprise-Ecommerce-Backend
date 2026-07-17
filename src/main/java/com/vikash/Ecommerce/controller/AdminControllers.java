@@ -1,10 +1,12 @@
 package com.vikash.Ecommerce.controller;
 
+import com.vikash.Ecommerce.dto.PageResponseDTO;
 import com.vikash.Ecommerce.dto.UserResponseDTO;
 import com.vikash.Ecommerce.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,15 +18,29 @@ import java.util.List;
 public class AdminControllers {
 
     private final AdminService adminService;
+//    private final Authentication authentication;
 
     @GetMapping("/dashboard")
     public String dashboard() {
         return "Admin Dashboard";
     }
 
+//    @GetMapping("/users")
+//    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+//        return ResponseEntity.ok(adminService.getAllUsers());
+//    }
+
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        return ResponseEntity.ok(adminService.getAllUsers());
+    public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+
+        return ResponseEntity.ok(
+                adminService.getAllUsers(page, size, sortBy, direction)
+        );
     }
 
     @GetMapping("/users/{id}")
@@ -43,4 +59,5 @@ public class AdminControllers {
         adminService.deleteAllUsers();
         return ResponseEntity.ok("All users deleted.");
     }
+
 }

@@ -1,18 +1,18 @@
 package com.vikash.Ecommerce.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
+@Entity
 @Table(name = "categories")
 public class Category {
 
@@ -31,6 +31,8 @@ public class Category {
     )
     private String name;
 
-    @ManyToMany(mappedBy = "category" , fetch = FetchType.EAGER , cascade = CascadeType.ALL)
-    private List<Product> product;
+    @Builder.Default
+    @ManyToMany(mappedBy = "categories",
+            fetch = FetchType.LAZY)
+    private Set<Product> products = new HashSet<>();
 }

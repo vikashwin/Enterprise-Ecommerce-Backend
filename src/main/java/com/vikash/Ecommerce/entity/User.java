@@ -24,12 +24,23 @@ import java.util.Set;
 @Table(
         name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_user_name_dob", columnNames = {"user_name", "date_of_birth"})
+                @UniqueConstraint(
+                        name = "uk_user_name_dob",
+                        columnNames = {"user_name", "date_of_birth"})
         },     //It can create a constraints where name+dob are always unique
         indexes = {
-        @Index(name = "idx_user_dob", columnList = "date_of_birth")
-        }      // It is creating a new table that help to find user by age rapidly
-        )
+                @Index(
+                        name = "idx_user_dob",
+                        columnList = "date_of_birth"
+                ),
+                @Index(
+                        name = "idx_user_email",
+                        columnList = "user_email"
+                )
+
+        } // It is creating a new table that help to find user by age rapidly
+
+)
 public class User {
 
     @Id
@@ -39,12 +50,10 @@ public class User {
 
 
     @Column(name = "user_name", nullable = false)
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "Name is required") // they also reject "  " not only null
     private String name;
 
-    @Column(name = "user_password", nullable = false)
-    @NotBlank // they also reject "  " not only null
-    @Size(min = 8, max = 100)
+    @Column(name = "user_password")
     private String password;
 
     @Column(name = "user_email", nullable = false, unique = true)
@@ -64,16 +73,40 @@ public class User {
     private String phoneNumber;
 
     @Column(name = "date_of_birth", nullable = false)
-    @NotNull
     private LocalDate dateOfBirth;
 
-    @NotNull
     @Column(name = "gender" , nullable = false )
     @Enumerated(EnumType.STRING)
     private UserGender gender;
 
+    @Column(name = "profile_image")
+    private String profileImage;
+
+
+    @Builder.Default
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
+
+    @Builder.Default
+    @Column(name = "enabled")
+    private Boolean enabled = true;
+
+    @Builder.Default
+    @Column(name = "account_locked")
+    private Boolean accountLocked = false;
+
+    @Builder.Default
+    @Column(name = "deleted")
+    private Boolean deleted = false;
+
+    // ================= Relationships =================
+
     //@OneToMany relationship always exit in inverse side
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL , orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL ,
+            orphanRemoval = true
+    )
     @Builder.Default
     private List<Address> addresses = new ArrayList<>();
 
@@ -86,11 +119,18 @@ public class User {
     @Builder.Default // Help to deal with nullPointerException when work with empty set
     private Set<Role> roles = new HashSet<>(); // this created a default empty set
 
-    @OneToMany(mappedBy="user", cascade = CascadeType.PERSIST)
+    @OneToMany(
+            mappedBy="user",
+            cascade = CascadeType.PERSIST
+    )
     @Builder.Default
     private List<Order> orders = new ArrayList<>();
 
-    @OneToMany(mappedBy="user" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy="user" ,
+            cascade = CascadeType.ALL ,
+            fetch = FetchType.LAZY
+    )
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
@@ -99,19 +139,10 @@ public class User {
     private LocalDateTime updatedAt;
 
     @CreationTimestamp //Create data and time automatically
-    @Column(name = "created_at", updatable = false, nullable = false)
+    @Column(name = "created_at",
+            updatable = false,
+            nullable = false
+    )
     private LocalDateTime createdAt;
 
-
-    @Builder.Default
-    private Boolean enabled = true;
-
-    @Builder.Default
-    private Boolean emailVerified = false;
-
-    @Builder.Default
-    private Boolean accountLocked = false;
-
-    @Builder.Default
-    private Boolean deleted = false;
 }

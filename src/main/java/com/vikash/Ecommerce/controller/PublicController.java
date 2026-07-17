@@ -19,7 +19,6 @@ public class PublicController {
 
     private final UserService userService; //Recommended by Spring because of no field injection and immutable
 
-
     @GetMapping("/test")
     public String test(){
         return "Test is Working";

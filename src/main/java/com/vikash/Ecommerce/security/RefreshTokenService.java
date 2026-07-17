@@ -52,15 +52,8 @@ public class RefreshTokenService {
      */
     public RefreshToken verify(String token) {
 
-        System.out.println("Request token: " + token);
-
         RefreshToken refreshToken = repository.findByToken(token)
                 .orElseThrow(() -> new InvalidRefreshTokenException("Refresh token not found"));
-
-        System.out.println("DB token: " + refreshToken.getToken());
-        System.out.println("Revoked: " + refreshToken.isRevoked());
-        System.out.println("Expiry: " + refreshToken.getExpiryDate());
-        System.out.println("Now: " + LocalDateTime.now());
 
         if (refreshToken.isRevoked()) {
             throw new InvalidRefreshTokenException("Refresh token revoked");

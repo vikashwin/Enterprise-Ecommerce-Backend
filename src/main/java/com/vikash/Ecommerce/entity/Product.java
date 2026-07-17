@@ -1,20 +1,24 @@
 package com.vikash.Ecommerce.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
+@Entity
 @Table(name = "products")
 public class Product {
 
@@ -33,10 +37,27 @@ public class Product {
     )
     private String name;
 
+    @NotBlank(message = "Description is required")
+    @Size(max = 1000)
+    private String description;
+
     @NotNull
     private Double price;
 
     private Integer stock;
+
+    private String imageUrl;
+
+    @Builder.Default
+    private Boolean active = true;  //allows soft-disabling products.
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
 
     @ManyToMany
     @JoinTable(
@@ -44,12 +65,13 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<Category> category;
+    @Builder.Default
+    private Set<Category> categories = new HashSet<>();
 
-    @OneToMany(mappedBy="product" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="product" , fetch = FetchType.LAZY)
     private List<Review> reviews;
 
-    @OneToMany(mappedBy="product" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="product" , fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
 
 }
