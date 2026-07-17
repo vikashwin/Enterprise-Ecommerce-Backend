@@ -3,6 +3,7 @@ package com.vikash.Ecommerce.service;
 import com.vikash.Ecommerce.dto.PageResponseDTO;
 import com.vikash.Ecommerce.dto.ProductRequestDTO;
 import com.vikash.Ecommerce.dto.ProductResponseDTO;
+import com.vikash.Ecommerce.dto.ProductSearchCriteriaDTO;
 import com.vikash.Ecommerce.entity.Category;
 import com.vikash.Ecommerce.entity.Product;
 import com.vikash.Ecommerce.exception.ResourceNotFoundException;
@@ -10,6 +11,7 @@ import com.vikash.Ecommerce.mapper.PageMapper;
 import com.vikash.Ecommerce.mapper.ProductMapper;
 import com.vikash.Ecommerce.repository.CategoryRepository;
 import com.vikash.Ecommerce.repository.ProductRepository;
+import com.vikash.Ecommerce.specification.ProductSpecification;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -110,5 +114,53 @@ public class ProductService {
                         new ResourceNotFoundException("Product not found with id : " + id));
 
         productRepository.delete(product);
+    }
+
+    public PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchCriteriaDTO criteria) {
+
+        Sort sort = criteria.getDirection().equalsIgnoreCase("desc")
+                ? Sort.by(criteria.getSortBy()).descending()
+                : Sort.by(criteria.getSortBy()).ascending();
+
+        Pageable pageable = PageRequest.of(
+                criteria.getPage(),
+                criteria.getSize(),
+                sort
+        );
+        Specification<Product> specification = Specification.unrestricted();
+
+        if (criteria.getName() != null && !criteria.getName().isBlank()) {
+            specification = specification.and(
+                    ProductSpecification.hasName(criteria.getName())
+            );
+        }
+        if (criteria.getCategoryId() != null) {
+            specification = specification.and(
+                    ProductSpecification.hasCategory(criteria.getCategoryId())
+            );
+        }
+        if (criteria.getMinPrice() != null) {
+            specification = specification.and(
+                    ProductSpecification.minPrice(criteria.getMinPrice())
+            );
+        }
+        if (criteria.getMaxPrice() != null) {
+            specification = specification.and(
+                    ProductSpecification.maxPrice(criteria.getMaxPrice())
+            );
+        }
+        if (Boolean.TRUE.equals(criteria.getInStock())) {
+            specification = specification.and(
+                    ProductSpecification.inStock()
+            );
+        }
+        Page<Product> page = productRepository.findAll(specification, pageable);
+        List<ProductResponseDTO> products =
+                page.getContent()
+                        .stream()
+                        .map(productMapper::toResponse)
+                        .toList();
+
+        return pageMapper.toPageResponse(page, products);
     }
 }
