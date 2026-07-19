@@ -15,6 +15,8 @@ import com.vikash.Ecommerce.specification.ProductSpecification;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,7 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final PageMapper pageMapper;
 
+    @CacheEvict(value = "products", allEntries = true)
     @Transactional
     public ProductResponseDTO createProduct(@Valid ProductRequestDTO dto) {
         Product product = productMapper.toEntity(dto);
@@ -60,6 +63,10 @@ public class ProductService {
 //                .toList();
 //    }
 
+    @Cacheable(
+            value = "products",
+            key = "'page-' + #page + '-size-' + #size + '-sort-' + #sortBy + '-dir-' + #direction"
+    )
     @Transactional
     public PageResponseDTO<ProductResponseDTO> getAllProducts(
             int page,
@@ -79,7 +86,9 @@ public class ProductService {
         return pageMapper.toPageResponse(productPage, products);
     }
 
+    @Cacheable(value = "products", key = "#id")
     public ProductResponseDTO getProductById(Long id) {
+        System.out.println("Fetching Product From Database...");
         Product product = productRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found with id : " + id));
@@ -87,6 +96,7 @@ public class ProductService {
         return productMapper.toResponse(product);
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     @Transactional
     public ProductResponseDTO updateProduct(@Valid ProductRequestDTO dto, Long id) {
         Product product = productRepository.findById(id)
@@ -107,6 +117,8 @@ public class ProductService {
         return productMapper.toResponse(updated);
     }
 
+
+    @CacheEvict(value = "products", allEntries = true)
     @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
@@ -117,11 +129,9 @@ public class ProductService {
     }
 
     public PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchCriteriaDTO criteria) {
-
         Sort sort = criteria.getDirection().equalsIgnoreCase("desc")
                 ? Sort.by(criteria.getSortBy()).descending()
                 : Sort.by(criteria.getSortBy()).ascending();
-
         Pageable pageable = PageRequest.of(
                 criteria.getPage(),
                 criteria.getSize(),

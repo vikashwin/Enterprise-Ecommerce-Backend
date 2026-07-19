@@ -29,64 +29,69 @@
 	<properties>
 		<java.version>21</java.version>
 	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
+    <dependencies>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
+        <!-- ==================== Web Layer ==================== -->
 
+        <!-- Provides Spring MVC, REST API support, embedded Tomcat server -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
 
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
+        <!-- ==================== Database Layer ==================== -->
 
-<!--        add Swagger-->
+        <!-- Provides Spring Data JPA, Hibernate ORM, Repository support -->
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.17</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-<!--        http://localhost:8080/v1/swagger-ui/index.html#/-->
-<!--        http://localhost:8080/v1/v3/api-docs-->
+        <!-- PostgreSQL database driver (loaded only at runtime) -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-<!--        SpringSecurity-->
+
+        <!-- ==================== Validation ==================== -->
+
+        <!-- Provides Bean Validation annotations like @Valid, @NotNull, @Email -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+
+        <!-- ==================== Security ==================== -->
+
+        <!-- Provides Spring Security authentication and authorization features -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-<!--        Oauth2 Security-->
+
+        <!-- Provides OAuth2 login/client support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
 
 
-<!--        JWT Security-->
+        <!-- ==================== JWT Authentication ==================== -->
+
+        <!-- JWT core API for creating and validating tokens -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>0.12.7</version>
         </dependency>
 
+
+        <!-- JWT implementation classes (runtime only) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
@@ -94,6 +99,8 @@
             <scope>runtime</scope>
         </dependency>
 
+
+        <!-- JWT JSON serialization/deserialization using Jackson -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
@@ -101,12 +108,66 @@
             <scope>runtime</scope>
         </dependency>
 
+
+        <!-- ==================== JSON Processing ==================== -->
+
+        <!-- Support Java 8+ date/time classes in JSON (LocalDate, LocalDateTime etc.) -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
-	</dependencies>
+
+        <!-- ==================== API Documentation ==================== -->
+
+        <!-- Generates OpenAPI documentation and Swagger UI -->
+        <!-- Swagger UI URL:
+             http://localhost:8080/v1/swagger-ui/index.html
+        -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.17</version>
+        </dependency>
+
+
+        <!-- ==================== Cache ==================== -->
+
+        <!-- Provides Redis integration for caching and data storage -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+
+        <!-- Enables Spring Cache abstraction (@Cacheable, @CacheEvict etc.) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+
+        <!-- ==================== Developer Tools ==================== -->
+
+        <!-- Reduces boilerplate code using annotations like @Getter, @Setter, @Builder -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+
+        <!-- ==================== Testing ==================== -->
+
+        <!-- Provides JUnit 5, Mockito, Spring Test framework and @SpringBootTest -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+    </dependencies>
 
 	<build>
 		<plugins>
