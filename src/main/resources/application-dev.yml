@@ -1,0 +1,71 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /v1
+
+spring:
+  application:
+    name: Ecommerce
+
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format-sql: true
+
+
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
+      ssl:
+        enabled: false
+#    Because we use http not secure connection https
+  # Redis cache configuration
+  cache:
+    type: redis
+
+
+  security:
+    user:
+      name: ${SPRING_SECURITY_USERNAME:admin}
+      password: ${SPRING_SECURITY_PASSWORD:admin}
+
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+
+#  http://localhost:8080/v1/oauth2/authorization/google
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+
+#  http://localhost:8080/v1/oauth2/authorization/github
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:900000}
+#  900000ms -> 900sec -> 15min
+
+refresh-token:
+  expiration: ${REFRESH_TOKEN_EXPIRATION:604800000}
+#  7days
+
+logging:
+  level:
+    org.springframework.cache: INFO
+#    org.springframework.cache: TRACE
+#    org.springframework.data.redis.cache: TRACE
+#    org.springframework.data.redis.serializer: DEBUG

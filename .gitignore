@@ -1,8 +1,16 @@
 HELP.md
+
+### Maven ###
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
 
 ### STS ###
 .apt_generated
@@ -12,12 +20,6 @@ target/
 .settings
 .springBeans
 .sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
 
 ### NetBeans ###
 /nbproject/private/
@@ -33,10 +35,21 @@ build/
 .vscode/
 
 ### Images ###
-/images/
+images/
 
-# Ignore YAML files
-*.yml
+### Logs ###
+logs/
+*.log
 
-# Ignore only local configuration
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Environment ###
+.env
+.env.*
+
+!.env.example
+
+### Local Config ###
 src/main/resources/application-local.yml

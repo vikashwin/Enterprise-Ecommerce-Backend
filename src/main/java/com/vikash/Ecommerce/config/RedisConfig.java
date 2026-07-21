@@ -63,7 +63,7 @@ public class RedisConfig {
 
         RedisCacheConfiguration configuration =
                 RedisCacheConfiguration.defaultCacheConfig()
-                        .entryTtl(Duration.ofMinutes(10))
+                        .entryTtl(Duration.ofMinutes(10))  //Time-to-Live
                         .serializeKeysWith(
                                 RedisSerializationContext.SerializationPair
                                         .fromSerializer(new StringRedisSerializer()))
