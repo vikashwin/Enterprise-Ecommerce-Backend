@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import java.util.List;
 
@@ -76,6 +80,25 @@ public class AdminProductController {
         productService.deleteProduct(id);
         return ResponseEntity.ok("Product deleted successfully.");
 
+    }
+
+    @PostMapping(
+            value = "/{id}/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ProductResponseDTO> uploadImage(
+            @PathVariable Long id,
+            @RequestParam("image") MultipartFile image
+    ) throws IOException {
+        System.out.println("Reached controller");
+
+        return ResponseEntity.ok(productService.uploadProductImage(id, image));
+    }
+
+    @DeleteMapping("/{id}/image")
+    public ResponseEntity<String> deleteProductImage(@PathVariable Long id){
+        productService.deleteProductImage(id);
+        return ResponseEntity.ok("Product image deleted successfully.");
     }
 
 }

@@ -24,7 +24,9 @@ import org.springframework.data.domain.Sort;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +39,9 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
     private final PageMapper pageMapper;
+    private final S3Service s3Service;
+    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
 
     @CacheEvict(value = "products", allEntries = true)
     @Transactional
@@ -117,16 +122,87 @@ public class ProductService {
         return productMapper.toResponse(updated);
     }
 
+//    Upload or replace product image
+@CacheEvict(value = "products", allEntries = true)
+@Transactional
+public ProductResponseDTO uploadProductImage(Long productId, MultipartFile image) throws IOException {
 
+    Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id : " + productId)
+            );
+
+    if(!isValidImage(image)){
+        throw new RuntimeException(
+                "Only JPG, PNG and WEBP images are allowed"
+        );
+    }
+    String oldImageUrl = product.getImageUrl();
+    // Upload new image first
+    String newImageUrl = s3Service.uploadFile(image);
+    // Update database
+    product.setImageUrl(newImageUrl);
+    Product savedProduct = productRepository.save(product);
+    // Delete old image after successful save
+    if(oldImageUrl != null){
+        s3Service.deleteFile(oldImageUrl);
+    }
+    return productMapper.toResponse(savedProduct);
+}
+
+//    Delete only product image
     @CacheEvict(value = "products", allEntries = true)
     @Transactional
-    public void deleteProduct(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Product not found with id : " + id));
+    public void deleteProductImage(Long productId){
+        Product product = productRepository.findById(productId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Product not found with id : " + productId)
+                        );
 
-        productRepository.delete(product);
+
+        if(product.getImageUrl()!=null){
+            s3Service.deleteFile(product.getImageUrl());
+            product.setImageUrl(null);
+            productRepository.save(product);
+        }
     }
+
+//    Delete product and S3 image
+    @CacheEvict(value = "products", allEntries = true)
+    @Transactional
+    public void deleteProduct(Long id){
+        Product product = productRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Product not found with id : " + id)
+                        );
+        // Remove database record
+        productRepository.delete(product);
+        // Remove image from S3
+        if(product.getImageUrl()!=null){
+            s3Service.deleteFile(product.getImageUrl());
+        }
+
+
+    }
+
+    private boolean isValidImage(MultipartFile file){
+        if(file.isEmpty()){
+            return false;
+        }
+
+        if(file.getSize() > MAX_IMAGE_SIZE){
+            throw new RuntimeException(
+                    "Image size must be less than 5MB"
+            );
+        }
+        String contentType = file.getContentType();
+        return contentType != null &&
+                (
+                        contentType.equals("image/jpeg") ||
+                                contentType.equals("image/png") ||
+                                contentType.equals("image/webp")
+                );
+    }
+
 
     public PageResponseDTO<ProductResponseDTO> searchProducts(ProductSearchCriteriaDTO criteria) {
         Sort sort = criteria.getDirection().equalsIgnoreCase("desc")

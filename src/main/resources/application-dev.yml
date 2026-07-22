@@ -69,3 +69,9 @@ logging:
 #    org.springframework.cache: TRACE
 #    org.springframework.data.redis.cache: TRACE
 #    org.springframework.data.redis.serializer: DEBUG
+
+aws:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  region: ${AWS_REGION}
+  bucket-name: ${AWS_BUCKET_NAME}

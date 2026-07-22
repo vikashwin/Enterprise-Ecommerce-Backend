@@ -17,3 +17,8 @@ GITHUB_CLIENT_SECRET=your_github_client_secret
 
 SPRING_SECURITY_USERNAME=admin
 SPRING_SECURITY_PASSWORD=admin
+
+AWS_ACCESS_KEY=AKIxxxxxxxxxx
+AWS_SECRET_KEY=aws_secret_key
+AWS_REGION=ap-south-1
+AWS_BUCKET_NAME=aws_buket_name
