@@ -18,7 +18,6 @@ import java.util.List;
 public class AdminControllers {
 
     private final AdminService adminService;
-//    private final Authentication authentication;
 
     @GetMapping("/dashboard")
     public String dashboard() {

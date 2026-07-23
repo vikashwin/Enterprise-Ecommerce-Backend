@@ -10,7 +10,6 @@ public class CategoryMapper {
 
     // DTO -> Entity
     public Category toEntity(CategoryRequestDTO dto){
-
         return Category.builder()
                 .name(dto.getName())
                 .build();
@@ -18,7 +17,6 @@ public class CategoryMapper {
 
     // Entity -> DTO
     public CategoryResponseDTO toResponse(Category category){
-
         return CategoryResponseDTO.builder()
                 .id(category.getId())
                 .name(category.getName())
